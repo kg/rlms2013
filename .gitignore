@@ -1,0 +1,7 @@
+*.suo
+*.cachefile
+*.user
+RLMS/bin
+RLMS/obj
+RLMSContent/bin
+RLMSContent/obj

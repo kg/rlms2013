@@ -1,0 +1,58 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RLMS", "RLMS\RLMS.csproj", "{92447116-941B-45E9-A428-3E5C973EBD98}"
+EndProject
+Project("{96E2B04D-8817-42C6-938A-82C39BA4D311}") = "RLMSContent", "RLMSContent\RLMSContent.contentproj", "{730FE74F-7622-4D7E-A80C-6DE465200D79}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squared.Render", "..\Fracture\Squared\RenderLib\Squared.Render.csproj", "{FE871F18-FD35-4124-AF8F-0021C9D4BA29}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DummyContentContainer", "..\Fracture\Squared\DummyContentContainer\DummyContentContainer.csproj", "{EAB7FAD6-0915-4134-8331-A2A1F84C6274}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RenderLibContent", "..\Fracture\Squared\RenderLib\Content\RenderLibContent.contentproj", "{D4565A8E-D70B-4E36-B1AE-DF5D9C0EA4B0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squared.Util", "..\Fracture\Squared\Util\Squared.Util.csproj", "{D7F549CF-E0A6-491C-A78C-ECAB590BB2A7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squared.Game", "..\Fracture\Squared\GameLib\Squared.Game.csproj", "{36463AEE-E309-43A6-BCFA-A69944390AF0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squared.Task", "..\Fracture\Squared\TaskLib\Squared.Task.csproj", "{173ABDCA-7278-46FF-A300-D3BF8CCEF181}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{92447116-941B-45E9-A428-3E5C973EBD98}.Debug|x86.ActiveCfg = Debug|x86
+		{92447116-941B-45E9-A428-3E5C973EBD98}.Debug|x86.Build.0 = Debug|x86
+		{92447116-941B-45E9-A428-3E5C973EBD98}.Release|x86.ActiveCfg = Release|x86
+		{92447116-941B-45E9-A428-3E5C973EBD98}.Release|x86.Build.0 = Release|x86
+		{730FE74F-7622-4D7E-A80C-6DE465200D79}.Debug|x86.ActiveCfg = Debug|x86
+		{730FE74F-7622-4D7E-A80C-6DE465200D79}.Release|x86.ActiveCfg = Release|x86
+		{FE871F18-FD35-4124-AF8F-0021C9D4BA29}.Debug|x86.ActiveCfg = Debug|x86
+		{FE871F18-FD35-4124-AF8F-0021C9D4BA29}.Debug|x86.Build.0 = Debug|x86
+		{FE871F18-FD35-4124-AF8F-0021C9D4BA29}.Release|x86.ActiveCfg = Release|x86
+		{FE871F18-FD35-4124-AF8F-0021C9D4BA29}.Release|x86.Build.0 = Release|x86
+		{EAB7FAD6-0915-4134-8331-A2A1F84C6274}.Debug|x86.ActiveCfg = Debug|x86
+		{EAB7FAD6-0915-4134-8331-A2A1F84C6274}.Debug|x86.Build.0 = Debug|x86
+		{EAB7FAD6-0915-4134-8331-A2A1F84C6274}.Release|x86.ActiveCfg = Release|x86
+		{EAB7FAD6-0915-4134-8331-A2A1F84C6274}.Release|x86.Build.0 = Release|x86
+		{D4565A8E-D70B-4E36-B1AE-DF5D9C0EA4B0}.Debug|x86.ActiveCfg = Debug|x86
+		{D4565A8E-D70B-4E36-B1AE-DF5D9C0EA4B0}.Release|x86.ActiveCfg = Release|x86
+		{D7F549CF-E0A6-491C-A78C-ECAB590BB2A7}.Debug|x86.ActiveCfg = Debug|x86
+		{D7F549CF-E0A6-491C-A78C-ECAB590BB2A7}.Debug|x86.Build.0 = Debug|x86
+		{D7F549CF-E0A6-491C-A78C-ECAB590BB2A7}.Release|x86.ActiveCfg = Release|x86
+		{D7F549CF-E0A6-491C-A78C-ECAB590BB2A7}.Release|x86.Build.0 = Release|x86
+		{36463AEE-E309-43A6-BCFA-A69944390AF0}.Debug|x86.ActiveCfg = Debug|x86
+		{36463AEE-E309-43A6-BCFA-A69944390AF0}.Debug|x86.Build.0 = Debug|x86
+		{36463AEE-E309-43A6-BCFA-A69944390AF0}.Release|x86.ActiveCfg = Release|x86
+		{36463AEE-E309-43A6-BCFA-A69944390AF0}.Release|x86.Build.0 = Release|x86
+		{173ABDCA-7278-46FF-A300-D3BF8CCEF181}.Debug|x86.ActiveCfg = Debug|x86
+		{173ABDCA-7278-46FF-A300-D3BF8CCEF181}.Debug|x86.Build.0 = Debug|x86
+		{173ABDCA-7278-46FF-A300-D3BF8CCEF181}.Release|x86.ActiveCfg = Release|x86
+		{173ABDCA-7278-46FF-A300-D3BF8CCEF181}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
