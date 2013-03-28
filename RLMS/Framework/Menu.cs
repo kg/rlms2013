@@ -220,12 +220,6 @@ namespace RLMS.Framework {
             var size = Measure();
             var pos = new Vector2(Game.ViewportWidth - size.X, Game.ViewportHeight - size.Y) * new Vector2(0.5f, 0.5f);
 
-            var activeColor = Color.White;
-            var inactiveColor = new Color(127, 127, 127, 255);
-            var outlineColor = Color.Black;
-
-            IMenuItem selectedItem = null;
-
             renderer.FillRectangle(
                 new Bounds(                    
                     pos - new Vector2(4, 4),
@@ -242,10 +236,8 @@ namespace RLMS.Framework {
 
                 item.Draw(Game, ref renderer, pos, itemSize, selected);
 
-                if (selected) {
+                if (selected)
                     DrawCursor(Game, ref renderer, pos, size, itemSize);
-                    selectedItem = item;
-                }
 
                 pos.Y += itemSize.Y;
             }
@@ -257,10 +249,7 @@ namespace RLMS.Framework {
                 return;
 
             var size = Measure();
-
             var pos = new Vector2(Game.ViewportWidth - size.X, Game.ViewportHeight - size.Y) * new Vector2(0.5f, 0.5f);
-
-            IMenuItem selectedItem = null;
 
             for (int i = 0; i < Items.Count; i++) {
                 var item = Items[i];

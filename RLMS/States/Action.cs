@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using RLMS.Framework;
+using Squared.Game;
 using Squared.Render;
 using Squared.Render.Convenience;
 using RLMS.States.Action;
@@ -35,9 +37,18 @@ namespace RLMS.States {
             }
         }
 
+        public T Building<T> ()
+            where T : RuntimeBuilding {
+
+            return Entities.OfType<T>().First();
+        }
+
         protected void SetupRuntimeState () {
+            foreach (var b in Mill.Buildings)
+                Entities.Add(b.CreateRuntimeBuilding(this));
+
             foreach (var lj in Mill.Roster)
-                Entities.Add(new RuntimeLumberjack(this, lj));
+                Entities.Add(lj.CreateRuntimeEntity(this));
         }
 
         protected IEnumerator<object> LoadContent () {
@@ -45,6 +56,16 @@ namespace RLMS.States {
             yield return Game.ContentLoader.LoadContent<Texture2D>("log").Bind(() => Log);
 
             ContentLoaded = true;
+        }
+
+        public IEnumerable<Entity> HitTest (Vector2 position) {
+            return HitTest(new Bounds(position, position));
+        }
+
+        public IEnumerable<Entity> HitTest (Bounds bounds) {
+            foreach (var entity in Entities)
+                if (bounds.Intersects(entity.Bounds))
+                    yield return entity;
         }
 
         public IEnumerator<object> Main () {
@@ -65,6 +86,17 @@ namespace RLMS.States {
 
             renderer.Draw(Background, 0, 0);
             renderer.Layer += 1;
+
+            foreach (var entity in Entities)
+                entity.Draw(ref renderer);
+
+            if (Game.InputControls.MouseLocation.HasValue) {
+                foreach (var entity in HitTest(Game.InputControls.MouseLocation.Value)) {
+                    renderer.FillRectangle(entity.Bounds, Color.White * 0.5f);
+
+                    renderer.DrawString(Game.UIText, entity.ToString(), entity.Bounds.TopRight);
+                }
+            }
         }
     }
 }

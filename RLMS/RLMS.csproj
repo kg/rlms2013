@@ -111,6 +111,8 @@
     <Compile Include="Program.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="States\Action.cs" />
+    <Compile Include="States\Action\AdminBuilding.cs" />
+    <Compile Include="States\Action\Building.cs" />
     <Compile Include="States\Action\Entity.cs" />
     <Compile Include="States\Action\Lumberjack.cs" />
     <Compile Include="States\Action\LumberMill.cs" />
