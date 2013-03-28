@@ -26,6 +26,7 @@ namespace RLMS.Framework {
         public InputControl Right;
         public InputControl Down;
 
+        public Vector2? MouseLocation = null;
         public Vector2 LeftStick;
         public Vector2 RightStick;
         public Vector2 DPad;
@@ -218,6 +219,14 @@ namespace RLMS.Framework {
                 Accept.State = true;
             if (ks.IsKeyDown(Keys.Escape, true))
                 Cancel.State = true;
+
+            var ms = Mouse.GetState();
+            if (ms.LeftButton == ButtonState.Pressed)
+                Accept.State = true;
+            if (ms.RightButton == ButtonState.Pressed)
+                Cancel.State = true;
+
+            MouseLocation = new Vector2(ms.X, ms.Y);
 #endif
         }
 

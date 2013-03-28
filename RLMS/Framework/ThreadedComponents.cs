@@ -66,6 +66,9 @@ namespace RLMS.Framework {
 
         public IThreadedState Current {
             get {
+                if (Stack.Count == 0)
+                    return null;
+
                 return Stack.Peek();
             }
         }

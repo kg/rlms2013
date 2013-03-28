@@ -16,9 +16,6 @@ using Squared.Util.Event;
 using RLMS.Framework;
 
 namespace RLMS {
-    /// <summary>
-    /// This is the main type for your game
-    /// </summary>
     public class Game : MultithreadedGame {
         public readonly EventBus EventBus = new EventBus();
         public readonly InputControls InputControls;
@@ -27,16 +24,21 @@ namespace RLMS {
 
         public DefaultMaterialSet Materials;
         public GraphicsDeviceManager Graphics;
+        public ContentLoader ContentLoader;
 
         public Texture2D Cursor;
         public SpriteFont UIText;
 
         public Game () {
-            Graphics = new GraphicsDeviceManager(this);
+            Graphics = new GraphicsDeviceManager(this) {
+                PreferredBackBufferWidth = 1280,
+                PreferredBackBufferHeight = 720
+            };
             Content.RootDirectory = "Content";
 
             States = new ThreadedStateStack(Scheduler);
             InputControls = new InputControls(EventBus);
+            IsMouseVisible = true;
         }
 
         protected TaskScheduler Scheduler {
@@ -63,15 +65,7 @@ namespace RLMS {
             }
         }
 
-        /// <summary>
-        /// Allows the game to perform any initialization it needs to before starting to run.
-        /// This is where it can query for any required services and load any non-graphic
-        /// related content.  Calling base.Initialize will enumerate through any components
-        /// and initialize them as well.
-        /// </summary>
         protected override void Initialize () {
-            // TODO: Add your initialization logic here
-
             base.Initialize();
 
             Scheduler.Start(MainTask(), TaskExecutionPolicy.RunAsBackgroundTask);
@@ -80,26 +74,16 @@ namespace RLMS {
                 InputControls.PickInputDevice();
         }
 
-        /// <summary>
-        /// LoadContent will be called once per game and is the place to load
-        /// all of your content.
-        /// </summary>
         protected override void LoadContent () {
-            // Create a new SpriteBatch, which can be used to draw textures.
             Materials = new DefaultMaterialSet(Services);
-
-            // TODO: use this.Content to load your game content here
 
             Cursor = Content.Load<Texture2D>("cursor");
             UIText = Content.Load<SpriteFont>("UIText");
+
+            ContentLoader = new ContentLoader(Content, GraphicsDevice, RenderCoordinator.CreateResourceLock);
         }
 
-        /// <summary>
-        /// UnloadContent will be called once per game and is the place to unload
-        /// all content.
-        /// </summary>
         protected override void UnloadContent () {
-            // TODO: Unload any non ContentManager content here
         }
 
         public IEnumerator<object> MainTask () {
@@ -116,8 +100,8 @@ namespace RLMS {
 
                 switch (menuItem) {
                     case "Action":
-                        yield return States.Push(new States.Action(this));
-                        yield break;
+                        yield return States.Push(new States.ActionState(this));
+                        break;
 
                     case "Exit":
                         this.Exit();
@@ -131,6 +115,10 @@ namespace RLMS {
 
             Scheduler.Step();
 
+            var currentState = States.Current;
+            if (currentState != null)
+                currentState.Update();
+
             foreach (var component in Components)
                 component.Update();
 
@@ -141,10 +129,18 @@ namespace RLMS {
         }
 
         public override void Draw (GameTime gameTime, Frame frame) {
-            var ir = new ImperativeRenderer(frame, Materials);
+            var ir = new ImperativeRenderer(
+                frame, Materials, 
+                blendState: BlendState.AlphaBlend,
+                samplerState: SamplerState.LinearClamp
+            );
 
-            ir.Clear(color: Color.CornflowerBlue);
+            ir.Clear(color: new Color(0, 0, 32));
             ir.Layer += 1;
+
+            var currentState = States.Current;
+            if (currentState != null)
+                currentState.Draw(frame, ref ir);
 
             foreach (var component in Components)
                 component.Draw(frame, ref ir);

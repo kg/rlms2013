@@ -204,7 +204,7 @@ namespace RLMS.Framework {
             renderer.Draw(ref drawCall);
         }
 
-        public void Draw (Frame frame, ref ImperativeRenderer renderer) {
+        protected Vector2 Measure () {
             var size = new Vector2(0, 0);
 
             foreach (var item in Items) {
@@ -213,6 +213,11 @@ namespace RLMS.Framework {
                 size.Y += itemSize.Y;
             }
 
+            return size;
+        }
+
+        public void Draw (Frame frame, ref ImperativeRenderer renderer) {
+            var size = Measure();
             var pos = new Vector2(Game.ViewportWidth - size.X, Game.ViewportHeight - size.Y) * new Vector2(0.5f, 0.5f);
 
             var activeColor = Color.White;
@@ -247,6 +252,28 @@ namespace RLMS.Framework {
         }
 
         public void Update () {
+            var ml = Game.InputControls.MouseLocation;
+            if (!ml.HasValue)
+                return;
+
+            var size = Measure();
+
+            var pos = new Vector2(Game.ViewportWidth - size.X, Game.ViewportHeight - size.Y) * new Vector2(0.5f, 0.5f);
+
+            IMenuItem selectedItem = null;
+
+            for (int i = 0; i < Items.Count; i++) {
+                var item = Items[i];
+                var itemSize = item.Measure(Game);
+                var itemBounds = new Bounds(
+                    pos, pos + itemSize
+                );
+
+                if (itemBounds.Contains(ml.Value))
+                    SelectedIndex = i;
+
+                pos.Y += itemSize.Y;
+            }
         }
 
         public override string ToString () {
