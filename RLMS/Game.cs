@@ -108,10 +108,17 @@ namespace RLMS {
             while (true) {
                 yield return Menu.ShowNew(
                     this, "Mode Select",
-                    new[] { "Exit" }
+                    new[] { 
+                        "Action",
+                        "Exit" 
+                    }
                 ).Bind(() => menuItem);
 
                 switch (menuItem) {
+                    case "Action":
+                        yield return States.Push(new States.Action(this));
+                        yield break;
+
                     case "Exit":
                         this.Exit();
                         yield break;
