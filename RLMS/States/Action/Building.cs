@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.Xna.Framework;
 using Squared.Game;
 
 namespace RLMS.States.Action {
@@ -20,6 +21,15 @@ namespace RLMS.States.Action {
 
         protected RuntimeBuilding (ActionState state)
             : base(state) {
+        }
+
+        public override void Update () {
+            var pos = Position + new Vector2(Hitbox.Size.X * 0.5f, Hitbox.Size.Y * 0.1f);
+
+            foreach (var occupant in Occupants) {
+                occupant.Position = pos;
+                pos += new Vector2(0, occupant.Hitbox.Size.Y);
+            }
         }
     }
 

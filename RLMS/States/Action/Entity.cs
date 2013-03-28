@@ -32,18 +32,18 @@ namespace RLMS.States.Action {
             if (building == OccupiedBuilding)
                 return;
 
-            if (OccupiedBuilding != null) {
+            if (OccupiedBuilding != null)
                 OccupiedBuilding.Occupants.Remove(this);
-            }
 
             OccupiedBuilding = building;
 
-            if (building != null) {
+            if (building != null)
                 building.Occupants.Add(this);
-                Position = building.Position + 
-                    new Vector2(building.Bounds.Size.X * 0.5f, 0) +
-                    new Vector2(0, Hitbox.Size.Y * building.Occupants.Count);
-            }
+        }
+
+        public void MoveTo (Vector2 position) {
+            Occupy(null);
+            Position = position;
         }
 
         public abstract void Update ();
