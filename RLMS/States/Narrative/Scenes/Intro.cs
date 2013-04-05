@@ -9,6 +9,8 @@ using Squared.Task;
 namespace RLMS.States.Narrative.Scenes {
     public class Intro : Narrative.Scene {
         public override IEnumerator<object> Main () {
+            Textbox.Clear();
+
             yield return ShowSmartText(@"'Dad' was definitely not what you expected to see on your caller ID.
 After your last conversation, it didn't seem likely you'd be talking to him again.
 The silence on the other end of the line made you wonder if you were still right.");

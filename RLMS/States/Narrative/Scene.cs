@@ -58,7 +58,8 @@ namespace RLMS.States.Narrative {
                 {'!', 0.5f},
                 {':', 0.15f},
                 {',', 0.07f},
-                {'\u2026', 0.35f}
+                {'\u2026', 0.35f},
+                {'\u65E0', 0.2f},
             };
             var pauseCharList = pauseChars.Keys.ToArray();
 
@@ -169,8 +170,9 @@ namespace RLMS.States.Narrative {
 
             if (Choice != null) {
                 Scene.Textbox.Clear();
+                yield return Scene.Pause(0.1f);
                 yield return Scene.Textbox.AddText(Choice.Text, font: Choice.Font, speaker: Choice.Speaker, lineBreak: true);
-                yield return Scene.Pause(0.25f);
+                yield return Scene.Pause(0.15f);
 
                 yield return Choice.Task();
             }

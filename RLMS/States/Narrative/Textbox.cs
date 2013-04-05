@@ -23,7 +23,9 @@ namespace RLMS.States.Narrative {
             public StringLayout Layout;
             public SignalFuture Future;
             public int Length;
+            public bool IsFullyVisible;
             public bool LineBreakAfter;
+            public bool IsMu;
         }
 
         public readonly NarrativeState State;
@@ -84,6 +86,15 @@ namespace RLMS.States.Narrative {
                     if (!Blips.TryGetValue(Speakers.ByName[s.Speaker].BlipSoundName, out currentBlip))
                         currentBlip = null;
                 }
+
+                if (s.IsMu) {
+                    currentBlip = null;
+
+                    if (!s.IsFullyVisible && isFullyVisible)
+                        Blips["Mu"].Play(0.8f, (float)BlippyRNG.NextDouble(-0.1f, 0.1f), 0f);
+                }
+
+                s.IsFullyVisible = isFullyVisible;
             }
 
             var advanceSpeed = Game.InputControls.Accept.State ? 4 : 1;
@@ -113,14 +124,29 @@ namespace RLMS.States.Narrative {
 
             foreach (var s in Strings) {
                 int charactersToDraw = Math.Min(charactersLeft, s.Layout.Count);
-                renderer.DrawMultiple(s.Layout.Slice(0, charactersToDraw));
+                if (s.IsMu) {
+                    var offset = new Vector2((float)BlippyRNG.NextDouble(-1, 1), (float)BlippyRNG.NextDouble(-1, 1));
+                    var scale = (float)BlippyRNG.NextDouble(0.95f, 1.05f);
+                    var rotation = (float)BlippyRNG.NextDouble(-0.04f, 0.04f);
+
+                    var dc = s.Layout.DrawCalls.Array[s.Layout.DrawCalls.Offset];
+                    dc.Position += offset;
+                    dc.ScaleF = scale;
+                    dc.Rotation = rotation;
+                    dc.MultiplyColor *= (float)BlippyRNG.NextDouble(0.7f, 1.1f);
+
+                    renderer.Draw(ref dc);
+                } else {
+                    renderer.DrawMultiple(s.Layout.Slice(0, charactersToDraw));
+                }
                 charactersLeft -= s.Length;
             }
         }
 
         public static string[] SplitWords (string text) {
             var result = new List<string>();
-            char[] WrapCharacters = new [] { '.', ',', ' ', ':', ';', '-', '?', '\n', '\u2026' };
+            char[] WrapCharacters = new [] { '.', ',', ' ', ':', ';', '-', '?', '\n', '\u2026', '\u65E0' };
+            // Ensure ellipses use the unicode character, because it makes things easier.
             text = text.Replace("...", "\u2026");
 
             int pos = 0, nextPos = 0;
@@ -133,8 +159,20 @@ namespace RLMS.States.Narrative {
                     break;
                 }
 
-                result.Add(text.Substring(pos, nextPos - pos + 1));
-                pos = nextPos + 1;
+                nextPos += 1;
+                var trailingChars = nextPos - pos;
+
+                // Tack single/double quotes onto the end of preceding words even if they have punctuation before them.
+                // Otherwise we get annoying single blips for quotes after punctuation. Yuck.
+                if (nextPos < text.Length) {
+                    if ((text[nextPos] == '\'') || (text[nextPos] == '\"')) {
+                        trailingChars += 1;
+                        nextPos += 1;
+                    }
+                }
+
+                result.Add(text.Substring(pos, trailingChars));
+                pos = nextPos;
             }
 
             return result.ToArray();
@@ -178,7 +216,8 @@ namespace RLMS.States.Narrative {
                     Speaker = speaker,
                     Font = actualFont,
                     Layout = actualFont.LayoutString(word, null, position: textPosition, xOffsetOfFirstLine: xOffset, color: color),
-                    Length = word.Trim().Length
+                    Length = word.Trim().Length,
+                    IsMu = word.Contains("\u65E0")
                 };
                 Strings.Add(s);
 
