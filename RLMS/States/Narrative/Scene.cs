@@ -49,6 +49,37 @@ namespace RLMS.States.Narrative {
                 yield return ShowAdvancePrompt();
         }
 
+        public IEnumerator<object> ShowSmartText (string text, string speaker = "Monologue") {
+            var words = Textbox.SplitWords(text);
+            var pauseChars = new Dictionary<char, float> {
+                {'\n', 0.1f},
+                {'.', 0.5f},
+                {'?', 0.5f},
+                {'!', 0.5f},
+                {':', 0.15f},
+                {',', 0.07f},
+                {'\u2026', 0.35f}
+            };
+            var pauseCharList = pauseChars.Keys.ToArray();
+
+            IFuture f = null;
+            foreach (var word in words) {
+                f = Textbox.AddText(word, speaker = speaker);
+
+                var pauseCharIndex = word.LastIndexOfAny(pauseCharList);
+                if (pauseCharIndex >= 0) {
+                    yield return f;
+                    f = null;
+
+                    var pauseChar = word[pauseCharIndex];
+                    yield return Pause(pauseChars[pauseChar]);
+                }
+            }
+
+            if (f != null)
+                yield return f;
+        }
+
         public IFuture ShowAdvancePrompt () {
             if (Controls.Accept.State) {
                 return State.Scheduler.Start(FastAdvance());
@@ -138,7 +169,7 @@ namespace RLMS.States.Narrative {
 
             if (Choice != null) {
                 Scene.Textbox.Clear();
-                yield return Scene.Textbox.Sentence(Choice.Text, font: Choice.Font, speaker: Choice.Speaker, lineBreak: true);
+                yield return Scene.Textbox.AddText(Choice.Text, font: Choice.Font, speaker: Choice.Speaker, lineBreak: true);
                 yield return Scene.Pause(0.25f);
 
                 yield return Choice.Task();

@@ -14,6 +14,8 @@ using Squared.Task;
 namespace RLMS.States.Narrative {
     public class Textbox {
         public const int BlippyInterval = 4;
+        public const float WordWrapRightMargin = 96;
+        public const float WordWrapIndent = 20;
 
         public class TextString {
             public string Speaker;
@@ -112,13 +114,14 @@ namespace RLMS.States.Narrative {
             foreach (var s in Strings) {
                 int charactersToDraw = Math.Min(charactersLeft, s.Layout.Count);
                 renderer.DrawMultiple(s.Layout.Slice(0, charactersToDraw));
-                charactersLeft -= charactersToDraw;
+                charactersLeft -= s.Length;
             }
         }
 
-        private static string[] SplitWords (string text) {
+        public static string[] SplitWords (string text) {
             var result = new List<string>();
-            char[] WrapCharacters = new [] { '.', ',', ' ', ':', ';', '-', '\n' };
+            char[] WrapCharacters = new [] { '.', ',', ' ', ':', ';', '-', '?', '\n', '\u2026' };
+            text = text.Replace("...", "\u2026");
 
             int pos = 0, nextPos = 0;
 
@@ -137,8 +140,8 @@ namespace RLMS.States.Narrative {
             return result.ToArray();
         }
 
-        public SignalFuture Sentence (string text, string speaker = "Monologue", SpriteFont font = null, bool lineBreak = false) {
-            var textPosition = Bounds.TopLeft;
+        public SignalFuture AddText (string text, string speaker = "Monologue", SpriteFont font = null, bool lineBreak = false) {
+            var textPosition = Bounds.TopLeft + new Vector2(8, 0);
             float xOffset = 0;
 
             if (Strings.Count > 0) {
@@ -160,12 +163,14 @@ namespace RLMS.States.Narrative {
 
             TextString s = null;
 
+            float rightMargin = Bounds.Size.X - WordWrapRightMargin;
+
             foreach (var word in words) {
                 var size = actualFont.MeasureString(word);
 
                 // word wrap
-                if ((xOffset + size.X) >= Bounds.Size.X) {
-                    xOffset = 16;
+                if ((xOffset + size.X) >= rightMargin) {
+                    xOffset = WordWrapIndent;
                     textPosition.Y += actualFont.LineSpacing;
                 }
 
@@ -173,7 +178,7 @@ namespace RLMS.States.Narrative {
                     Speaker = speaker,
                     Font = actualFont,
                     Layout = actualFont.LayoutString(word, null, position: textPosition, xOffsetOfFirstLine: xOffset, color: color),
-                    Length = word.Length
+                    Length = word.Trim().Length
                 };
                 Strings.Add(s);
 
