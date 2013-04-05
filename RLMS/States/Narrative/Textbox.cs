@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
@@ -16,9 +17,10 @@ namespace RLMS.States.Narrative {
 
         public class TextString {
             public string Speaker;
+            public SpriteFont Font;
             public StringLayout Layout;
-            public readonly SignalFuture Future = new SignalFuture();
-
+            public SignalFuture Future;
+            public int Length;
             public bool LineBreakAfter;
         }
 
@@ -66,14 +68,14 @@ namespace RLMS.States.Narrative {
             SoundEffect currentBlip = null;
 
             foreach (var s in Strings) {
-                TotalCharacterCount += s.Layout.Count;
+                TotalCharacterCount += s.Length;
 
-                int charactersToDraw = Math.Min(charactersLeft, s.Layout.Count);
-                var isFullyVisible = (charactersToDraw == s.Layout.Count);
+                int charactersToDraw = Math.Min(charactersLeft, s.Length);
+                var isFullyVisible = (charactersToDraw == s.Length);
                 var isVisible = (charactersToDraw > 0);
                 charactersLeft -= charactersToDraw;
 
-                if (isFullyVisible && !s.Future.Completed)
+                if (isFullyVisible && (s.Future != null) && !s.Future.Completed)
                     s.Future.SetResult(NoneType.None, null);
 
                 if (!isFullyVisible) {
@@ -114,6 +116,27 @@ namespace RLMS.States.Narrative {
             }
         }
 
+        private static string[] SplitWords (string text) {
+            var result = new List<string>();
+            char[] WrapCharacters = new [] { '.', ',', ' ', ':', ';', '-', '\n' };
+
+            int pos = 0, nextPos = 0;
+
+            while (pos < text.Length) {
+                nextPos = text.IndexOfAny(WrapCharacters, pos);
+
+                if (nextPos < pos) {
+                    result.Add(text.Substring(pos));
+                    break;
+                }
+
+                result.Add(text.Substring(pos, nextPos - pos + 1));
+                pos = nextPos + 1;
+            }
+
+            return result.ToArray();
+        }
+
         public SignalFuture Sentence (string text, string speaker = "Monologue", SpriteFont font = null, bool lineBreak = false) {
             var textPosition = Bounds.TopLeft;
             float xOffset = 0;
@@ -122,7 +145,7 @@ namespace RLMS.States.Narrative {
                 var ls = Strings.Last();
                 var lcb = ls.Layout.LastCharacterBounds.Translate(ls.Layout.Position);
                 if (ls.LineBreakAfter) {
-                    textPosition.Y = lcb.BottomRight.Y;
+                    textPosition.Y = lcb.TopLeft.Y + ls.Font.LineSpacing;
                 } else {
                     xOffset = lcb.BottomRight.X - ls.Layout.Position.X;
                     textPosition.Y = lcb.TopLeft.Y;
@@ -131,19 +154,42 @@ namespace RLMS.States.Narrative {
 
             bool italic = (speaker == "Monologue");
             var actualFont = font ?? (italic ? ItalicDialogueFont : DialogueFont);
-            var s = new TextString {
-                Speaker = speaker,
-                Layout = actualFont.LayoutString(
-                    text, null,
-                    position: textPosition,
-                    xOffsetOfFirstLine: xOffset,
-                    lineBreakAtX: Bounds.Size.X,
-                    color: Speakers.ByName[speaker].Color
-                ),
-                LineBreakAfter = lineBreak || text.EndsWith("\n")
-            };
-            Strings.Add(s);
-            return s.Future;
+            var color = Speakers.ByName[speaker].Color;
+
+            var words = SplitWords(text);
+
+            TextString s = null;
+
+            foreach (var word in words) {
+                var size = actualFont.MeasureString(word);
+
+                // word wrap
+                if ((xOffset + size.X) >= Bounds.Size.X) {
+                    xOffset = 16;
+                    textPosition.Y += actualFont.LineSpacing;
+                }
+
+                s = new TextString {
+                    Speaker = speaker,
+                    Font = actualFont,
+                    Layout = actualFont.LayoutString(word, null, position: textPosition, xOffsetOfFirstLine: xOffset, color: color),
+                    Length = word.Length
+                };
+                Strings.Add(s);
+
+                xOffset = s.Layout.LastCharacterBounds.BottomRight.X;
+
+                if (word.EndsWith("\n")) {
+                    xOffset = 0;
+                    textPosition.Y += actualFont.LineSpacing;
+                }
+            }
+
+            if (s == null)
+                return null;
+
+            s.LineBreakAfter = (lineBreak || text.EndsWith("\n"));
+            return s.Future = new SignalFuture();
         }
 
         public void Clear () {

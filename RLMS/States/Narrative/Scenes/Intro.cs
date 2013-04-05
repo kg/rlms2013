@@ -60,13 +60,11 @@ namespace RLMS.States.Narrative.Scenes {
             yield return Pause(0.4f);
             yield return Textbox.Sentence("a friend called me today. ", speaker: "Dad");
             yield return Pause();
-            yield return Textbox.Sentence("He's got a part-time job that needs filling \n", speaker: "Dad");
-            yield return Textbox.Sentence(" pretty quickly... ", speaker: "Dad");
+            yield return Textbox.Sentence("He's got a part-time job that needs filling pretty quickly... ", speaker: "Dad");
             yield return Pause(0.33f);
             yield return Textbox.Sentence("sounded like somebody quit in a hurry. ", speaker: "Dad");
             yield return Pause();
-            yield return Textbox.Sentence("It's a bit out \n", speaker: "Dad");
-            yield return Textbox.Sentence(" of the way, but the pay is good.\" \n", speaker: "Dad");
+            yield return Textbox.Sentence("It's a bit out of the way, but the pay is good.\" \n", speaker: "Dad");
             yield return Pause();
 
             yield return Textbox.Sentence("Huh. ");
@@ -103,7 +101,7 @@ namespace RLMS.States.Narrative.Scenes {
 
             yield return Textbox.Sentence("\"I know, hear me out. ", speaker: "Dad");
             yield return Pause();
-            yield return Textbox.Sentence("He needs someone to keep the place running.\n", speaker: "Dad");
+            yield return Textbox.Sentence("He needs someone to keep the place running. ", speaker: "Dad");
             yield return Pause();
             yield return Textbox.Sentence("Set schedules, balance the books... ", speaker: "Dad");
             yield return Pause();
@@ -132,8 +130,7 @@ namespace RLMS.States.Narrative.Scenes {
             yield return Textbox.Sentence("\"I know it's not what you're looking for, but... ", speaker: "Dad");
             yield return Pause(0.4f);
 
-            yield return Textbox.Sentence("could you give it a try? If things don't \n", speaker: "Dad");
-            yield return Textbox.Sentence(" work out, I'm sure he'll understand.\"\n", speaker: "Dad");
+            yield return Textbox.Sentence("could you give it a try? If things don't work out, I'm sure he'll understand.\"\n", speaker: "Dad");
             yield return Pause();
 
             yield return Pause(1);

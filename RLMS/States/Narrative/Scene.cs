@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using Microsoft.Xna.Framework;
 using RLMS.Framework;
@@ -62,6 +63,15 @@ namespace RLMS.States.Narrative {
         }
 
         public abstract IEnumerator<object> Main ();
+
+        public static Type[] GetAllSceneTypes () {
+            var tScene = typeof(Scene);
+            return (
+                from t in Assembly.GetExecutingAssembly().GetTypes() 
+                where !t.IsAbstract && tScene.IsAssignableFrom(t) 
+                select t
+            ).ToArray();
+        }
     }
 
     public class Branch : ISchedulable, IEnumerable<Branch.BranchItem> {

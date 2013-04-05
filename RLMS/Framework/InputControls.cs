@@ -36,6 +36,7 @@ namespace RLMS.Framework {
         public InputControl JoypadX;
         public InputControl JoypadB;
         public InputControl JoypadY;
+        public InputControl JoypadBack;
 
         public PlayerIndex? ActiveController;
 
@@ -56,6 +57,12 @@ namespace RLMS.Framework {
         public InputControl Cancel {
             get {
                 return JoypadB;
+            }
+        }
+
+        public InputControl Back {
+            get {
+                return JoypadBack;
             }
         }
 
@@ -177,7 +184,7 @@ namespace RLMS.Framework {
                     if (gs.IsButtonDown(Buttons.Y))
                         JoypadY.State = true;
                     if (gs.IsButtonDown(Buttons.Back))
-                        Cancel.State = true;
+                        JoypadBack.State = true;
 
                     if (!ActiveController.HasValue) {
                         if (gs.IsButtonDown(Buttons.Start) ||
@@ -218,8 +225,10 @@ namespace RLMS.Framework {
 
             if (ks.IsKeyDown(Keys.Space, true) || ks.IsKeyDown(Keys.Enter, true))
                 Accept.State = true;
-            if (ks.IsKeyDown(Keys.Escape, true))
+            if (ks.IsKeyDown(Keys.LeftControl, true) || ks.IsKeyDown(Keys.LeftAlt, true))
                 Cancel.State = true;
+            if (ks.IsKeyDown(Keys.Escape, true))
+                Back.State = true;
 
             var ms = Mouse.GetState();
             if (ms.LeftButton == ButtonState.Pressed)

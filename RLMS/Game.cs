@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
@@ -8,6 +9,7 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using RLMS.States.Narrative;
 using Squared.Game.Input;
 using Squared.Render;
 using Squared.Render.Convenience;
@@ -101,7 +103,7 @@ namespace RLMS {
 
                 switch (menuItem) {
                     case "Narrative":
-                        yield return States.Push(new States.NarrativeState(this, new States.Narrative.Scenes.Intro()));
+                        yield return NarrativeTest();
                         break;
 
                     case "Action":
@@ -113,6 +115,22 @@ namespace RLMS {
                         yield break;
                 }
             }
+        }
+
+        public IEnumerator<object> NarrativeTest () {
+            var allSceneTypes = Scene.GetAllSceneTypes();
+
+            string sceneName = null;
+
+            yield return Menu.ShowNew(
+                this, "Scene Select",
+                (from t in allSceneTypes select t.Name)
+            ).Bind(() => sceneName);
+
+            var sceneType = allSceneTypes.FirstOrDefault((s) => s.Name == sceneName);
+
+            if (sceneType != null)
+                yield return States.Push(new States.NarrativeState(this, (Scene)Activator.CreateInstance(sceneType)));
         }
 
         protected override void Update (GameTime gameTime) {
