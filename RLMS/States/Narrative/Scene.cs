@@ -172,9 +172,13 @@ namespace RLMS.States.Narrative {
                 Scene.Textbox.Clear();
                 yield return Scene.Pause(0.1f);
                 yield return Scene.Textbox.AddText(Choice.Text, font: Choice.Font, speaker: Choice.Speaker, lineBreak: true);
-                yield return Scene.Pause(0.15f);
 
-                yield return Choice.Task();
+                if (Choice.Task != null) {
+                    yield return Scene.Pause(0.15f);
+                    yield return Choice.Task();
+                } else {
+                    yield return Scene.Pause(0.3f);
+                }
             }
         }
 
