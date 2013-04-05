@@ -12,7 +12,7 @@ using Squared.Task;
 
 namespace RLMS.States.Narrative {
     public class Textbox {
-        public const int BlippyInterval = 5;
+        public const int BlippyInterval = 4;
 
         public class TextString {
             public string Speaker;
@@ -28,6 +28,7 @@ namespace RLMS.States.Narrative {
 
         public int TotalCharacterCount = 0;
         public int DisplayedCharacterCount = 0;
+        public int NextBlipTime = 0;
 
         public SpriteFont DialogueFont, ItalicDialogueFont, MenuFont;
         public Dictionary<string, SoundEffect> Blips;
@@ -76,8 +77,8 @@ namespace RLMS.States.Narrative {
                     s.Future.SetResult(NoneType.None, null);
 
                 if (!isFullyVisible) {
-                    if (!Blips.TryGetValue(s.Speaker, out currentBlip))
-                        currentBlip = Blips["Monologue"];
+                    if (!Blips.TryGetValue(Speakers.ByName[s.Speaker].BlipSoundName, out currentBlip))
+                        currentBlip = null;
                 }
             }
 
@@ -85,12 +86,17 @@ namespace RLMS.States.Narrative {
             var prev = DisplayedCharacterCount;
             DisplayedCharacterCount = Math.Min(TotalCharacterCount, DisplayedCharacterCount + advanceSpeed);
 
-            float blippyVolume = 0.8f;
-            if (Game.InputControls.Accept.State)
-                blippyVolume = 0.25f;
+            if (DisplayedCharacterCount > prev)
+                NextBlipTime -= 1;
 
-            if ((DisplayedCharacterCount > prev) && (DisplayedCharacterCount % BlippyInterval == 0) && (currentBlip != null))
-                currentBlip.Play(blippyVolume, (float)BlippyRNG.NextDouble(-0.06f, 0.06f), 0f);
+            if ((currentBlip != null) && (NextBlipTime <= 0)) {
+                float blippyVolume = (currentBlip == Blips["Monologue"]) ? 0.4f : 0.75f;
+                if (Game.InputControls.Accept.State)
+                    blippyVolume = 0.33f;
+
+                currentBlip.Play(blippyVolume, (float)BlippyRNG.NextDouble(-0.055f, 0.055f), 0f);
+                NextBlipTime = BlippyInterval;
+            }
         }
 
         public void Draw (Frame frame, ref ImperativeRenderer renderer) {
@@ -132,7 +138,7 @@ namespace RLMS.States.Narrative {
                     position: textPosition,
                     xOffsetOfFirstLine: xOffset,
                     lineBreakAtX: Bounds.Size.X,
-                    color: Colors.ByName[speaker]
+                    color: Speakers.ByName[speaker].Color
                 ),
                 LineBreakAfter = lineBreak || text.EndsWith("\n")
             };
@@ -143,6 +149,7 @@ namespace RLMS.States.Narrative {
         public void Clear () {
             Strings.Clear();
             DisplayedCharacterCount = TotalCharacterCount = 0;
+            NextBlipTime = 0;
         }
     }
 }

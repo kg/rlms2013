@@ -23,10 +23,10 @@ namespace RLMS.States.Narrative.Scenes {
 
         public IEnumerator<object> HeyDad () {
             yield return Textbox.Sentence("He pauses for just slightly too long before responding: \n");
-            yield return new Sleep(1.6);
+            yield return Pause(1.6f);
 
             yield return Textbox.Sentence("\"Hi. I uh... ", speaker: "Dad");
-            yield return new Sleep(0.33f);
+            yield return Pause(0.33f);
             yield return Textbox.Sentence("figured you might still be looking for work?\"\n", speaker: "Dad");
             yield return Pause();
 
@@ -39,7 +39,7 @@ namespace RLMS.States.Narrative.Scenes {
 
         public IEnumerator<object> WhatsUp () {
             yield return Textbox.Sentence("\"Not... ", speaker: "Dad");
-            yield return new Sleep(0.33f);
+            yield return Pause(0.33f);
             yield return Textbox.Sentence("not much. Have you found any work yet?\"\n", speaker: "Dad");
             yield return Pause();
 
@@ -54,15 +54,15 @@ namespace RLMS.States.Narrative.Scenes {
 
             Textbox.Clear();
 
-            yield return new Sleep(0.66f);
+            yield return Pause(0.66f);
 
             yield return Textbox.Sentence("\"So, uh... ", speaker: "Dad");
-            yield return new Sleep(0.4f);
+            yield return Pause(0.4f);
             yield return Textbox.Sentence("a friend called me today. ", speaker: "Dad");
             yield return Pause();
             yield return Textbox.Sentence("He's got a part-time job that needs filling \n", speaker: "Dad");
             yield return Textbox.Sentence(" pretty quickly... ", speaker: "Dad");
-            yield return new Sleep(0.33f);
+            yield return Pause(0.33f);
             yield return Textbox.Sentence("sounded like somebody quit in a hurry. ", speaker: "Dad");
             yield return Pause();
             yield return Textbox.Sentence("It's a bit out \n", speaker: "Dad");
@@ -73,7 +73,9 @@ namespace RLMS.States.Narrative.Scenes {
             yield return Pause();
             yield return Textbox.Sentence("What's the catch? ");
             yield return Pause();
-            yield return Textbox.Sentence("\"That sounds alright. What's the work? ", speaker: "Callista");
+            yield return Textbox.Sentence("\"That sounds alright. ", speaker: "Callista");
+            yield return Pause();
+            yield return Textbox.Sentence("What's the work? ", speaker: "Callista");
             yield return Pause();
             yield return Textbox.Sentence("And where is it?\"\n", speaker: "Callista");
 
@@ -86,13 +88,13 @@ namespace RLMS.States.Narrative.Scenes {
             Textbox.Clear();
 
             yield return Textbox.Sentence("\"He owns some kind of lumber mill on an island off the coast, upstate.\"\n", speaker: "Dad");
-            yield return new Sleep(0.6f);
+            yield return Pause(0.6f);
 
             yield return Textbox.Sentence("What. ");
-            yield return new Sleep(1.3f);
+            yield return Pause(1.3f);
 
             yield return Textbox.Sentence("\"I'd... ", speaker: "Callista");
-            yield return new Sleep(0.2f);
+            yield return Pause(0.3f);
             yield return Textbox.Sentence("make a pretty terrible lumberjack, Dad.\"\n", speaker: "Callista");
             yield return Pause();
 
@@ -122,19 +124,19 @@ namespace RLMS.States.Narrative.Scenes {
             yield return Pause();
 
             yield return Textbox.Sentence("That's a corner, alright. ");
-            yield return new Sleep(0.6f);
+            yield return Pause(0.6f);
 
             yield return Textbox.Sentence("\"Yeah, I guess so.\"\n", speaker: "Callista");
             yield return Pause();
 
             yield return Textbox.Sentence("\"I know it's not what you're looking for, but... ", speaker: "Dad");
-            yield return new Sleep(0.4f);
+            yield return Pause(0.4f);
 
             yield return Textbox.Sentence("could you give it a try? If things don't \n", speaker: "Dad");
             yield return Textbox.Sentence(" work out, I'm sure he'll understand.\"\n", speaker: "Dad");
             yield return Pause();
 
-            yield return new Sleep(1);
+            yield return Pause(1);
             yield return ShowAdvancePrompt();
         }
     }

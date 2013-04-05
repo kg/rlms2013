@@ -36,17 +36,29 @@ namespace RLMS.States.Narrative {
             }
         }
 
-        public Sleep Pause () {
-            return new Sleep(Controls.Accept.State ? 0.2f : 0.7f);
+        public Sleep Pause (float duration = 0.7f) {
+            float multiplier = Controls.Accept.State ? 0.25f : 1.0f;
+            return new Sleep(multiplier * duration);
         }
 
-        public SignalFuture ShowAdvancePrompt () {
-            State.AdvancePromptVisible = true;
-            var f = Controls.Accept.WaitForPress();
-            f.RegisterOnComplete((_) => {
-                State.AdvancePromptVisible = false;
-            });
-            return f;
+        protected IEnumerator<object> FastAdvance () {
+            yield return new Sleep(0.4);
+
+            if (!Controls.Accept.State)
+                yield return ShowAdvancePrompt();
+        }
+
+        public IFuture ShowAdvancePrompt () {
+            if (Controls.Accept.State) {
+                return State.Scheduler.Start(FastAdvance());
+            } else {
+                State.AdvancePromptVisible = true;
+                var f = Controls.Accept.WaitForPress();
+                f.RegisterOnComplete((_) => {
+                    State.AdvancePromptVisible = false;
+                });
+                return f;
+            }
         }
 
         public abstract IEnumerator<object> Main ();
@@ -63,7 +75,7 @@ namespace RLMS.States.Narrative {
                 Branch = branch;
                 Text = text;
                 Speaker = speaker;
-                Color = Colors.ByName[speaker];
+                Color = Speakers.ByName[speaker].Color;
                 Task = task;
             }
 
@@ -117,7 +129,7 @@ namespace RLMS.States.Narrative {
             if (Choice != null) {
                 Scene.Textbox.Clear();
                 yield return Scene.Textbox.Sentence(Choice.Text, font: Choice.Font, speaker: Choice.Speaker, lineBreak: true);
-                yield return new Sleep(0.2f);
+                yield return Scene.Pause(0.25f);
 
                 yield return Choice.Task();
             }

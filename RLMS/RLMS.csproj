@@ -119,7 +119,8 @@
     <Compile Include="States\Exploration.cs" />
     <Compile Include="States\Narrative.cs" />
     <Compile Include="States\Narrative\Scene.cs" />
-    <Compile Include="States\Narrative\Colors.cs" />
+    <Compile Include="States\Narrative\Scenes\Ferry.cs" />
+    <Compile Include="States\Narrative\Speakers.cs" />
     <Compile Include="States\Narrative\Scenes\Intro.cs" />
     <Compile Include="States\Narrative\Textbox.cs" />
   </ItemGroup>
