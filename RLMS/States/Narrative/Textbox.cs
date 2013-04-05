@@ -141,6 +141,8 @@ namespace RLMS.States.Narrative {
                 }
                 charactersLeft -= s.Length;
             }
+
+            renderer.Layer += 1;
         }
 
         public static string[] SplitWords (string text) {

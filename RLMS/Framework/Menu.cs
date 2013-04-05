@@ -228,13 +228,25 @@ namespace RLMS.Framework {
             var size = Measure();
             var pos = new Vector2(Game.ViewportWidth - size.X, Game.ViewportHeight - size.Y) * new Vector2(0.5f, 0.5f);
 
+            pos.X = (float)Math.Floor(pos.X);
+            pos.Y = (float)Math.Floor(pos.Y);
+
+            var menuBounds = new Bounds(                    
+                pos - new Vector2(4, 4),
+                pos + size + new Vector2(4, 4)
+            );
+
             renderer.FillRectangle(
-                new Bounds(                    
-                    pos - new Vector2(4, 4),
-                    pos + size + new Vector2(4, 4)
-                ),
+                menuBounds,
                 new Color(0.0f, 0.0f, 0.0f, BackgroundOpacity)
             );
+            renderer.Layer += 1;
+
+            renderer.OutlineRectangle(
+                menuBounds,
+                Color.White
+            );
+
             renderer.Layer += 1;
 
             for (int i = 0; i < Items.Count; i++) {
@@ -249,6 +261,8 @@ namespace RLMS.Framework {
 
                 pos.Y += itemSize.Y;
             }
+
+            renderer.Layer += 1;
         }
 
         public void Update () {
