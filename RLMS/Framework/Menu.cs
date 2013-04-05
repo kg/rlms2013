@@ -13,7 +13,7 @@ using Squared.Render;
 
 namespace RLMS.Framework {
     public interface IMenuItem {
-        void Initialize ();
+        void Initialize (Menu menu);
         void Draw (Game game, ref ImperativeRenderer renderer, Vector2 itemPosition, Vector2 itemSize, bool selected);
         Vector2 Measure (Game game);
         void HandleInput (Game game, EventInfo e);
@@ -22,8 +22,11 @@ namespace RLMS.Framework {
     public class TextMenuItem : IMenuItem, IEventSource {
         public string Text;
         public Action<TextMenuItem> Handler;
+        public SpriteFont Font;
 
-        public virtual void Initialize () {
+        public virtual void Initialize (Menu menu) {
+            if (Font == null)
+                Font = menu.Font;
         }
 
         public virtual void Draw (Game game, ref ImperativeRenderer renderer, Vector2 itemPosition, Vector2 itemSize, bool selected) {
@@ -31,7 +34,7 @@ namespace RLMS.Framework {
                 return;
 
             renderer.DrawString(
-                game.UIText, Text, itemPosition, 
+                Font, Text, itemPosition, 
                 (selected) ? Color.White : new Color(127, 127, 127, 255)
             );
         }
@@ -40,7 +43,7 @@ namespace RLMS.Framework {
             if (Text == null)
                 return Vector2.Zero;
 
-            return game.UIText.MeasureString(Text);
+            return Font.MeasureString(Text);
         }
 
         public virtual void HandleInput (Game game, EventInfo e) {
@@ -74,20 +77,23 @@ namespace RLMS.Framework {
         public event Action Cancelled;
 
         public readonly Game Game;
+        public SpriteFont Font;
         public List<IMenuItem> Items = new List<IMenuItem>();
         public int SelectedIndex = 0;
 
         public Menu (Game game, string description, IFuture future, params IMenuItem[] items) {
             Game = game;
             Description = description;
+            Font = game.UIText;
 
             Items.AddRange(items);
         }
 
-        public static IEnumerator<object> ShowNew (Game game, string description, IEnumerable<object> items) {
+        public static IEnumerator<object> ShowNew (Game game, string description, IEnumerable<object> items, SpriteFont font = null) {
             var f = new Future<string>();
 
             var menu = new Menu(game, description, f);
+            menu.Font = font ?? menu.Font;
 
             foreach (var item in items) {
                 if (item is IMenuItem) {
@@ -101,6 +107,8 @@ namespace RLMS.Framework {
                         }
                     };
                     menu.Items.Add(menuItem);
+                } else {
+                    throw new InvalidOperationException("Menu items must be strings or IMenuItem instances");
                 }
             }
 
@@ -118,7 +126,7 @@ namespace RLMS.Framework {
 
         public void Shown () {
             foreach (var item in Items)
-                item.Initialize();
+                item.Initialize(this);
 
             Game.InputControls.EventBus.Subscribe(null, null, EventListener);
             Game.InputControls.EventBus.Subscribe(null, "ControllerDisconnected", _ControllerDisconnected);

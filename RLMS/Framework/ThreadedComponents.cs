@@ -36,7 +36,7 @@ namespace RLMS.Framework {
 
     public class ThreadedStateStack {
         private Dictionary<IThreadedState, IFuture> Futures = new Dictionary<IThreadedState, IFuture>();
-        private Stack<IThreadedState> Stack = new Stack<IThreadedState>();
+        private List<IThreadedState> Stack = new List<IThreadedState>();
         private TaskScheduler Scheduler;
 
         public ThreadedStateStack (TaskScheduler scheduler) {
@@ -47,18 +47,23 @@ namespace RLMS.Framework {
             if (Futures.ContainsKey(state))
                 throw new InvalidOperationException();
 
-            Stack.Push(state);
+            Stack.Add(state);
 
             var future = Scheduler.Start(
                 state.Main(), TaskExecutionPolicy.RunAsBackgroundTask
             );
             Futures[state] = future;
 
+            future.RegisterOnComplete((_) => {
+                Stack.Remove(state);
+            });
+
             return future;
         }
 
         public void Pop () {
-            var state = Stack.Pop();
+            var state = Stack.Last();
+            Stack.RemoveAt(Stack.Count - 1);
 
             Futures[state].Dispose();
             Futures.Remove(state);
@@ -69,7 +74,7 @@ namespace RLMS.Framework {
                 if (Stack.Count == 0)
                     return null;
 
-                return Stack.Peek();
+                return Stack[Stack.Count - 1];
             }
         }
     }

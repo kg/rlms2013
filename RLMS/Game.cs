@@ -92,13 +92,18 @@ namespace RLMS {
             while (true) {
                 yield return Menu.ShowNew(
                     this, "Mode Select",
-                    new[] { 
+                    new[] {
+                        "Narrative",
                         "Action",
                         "Exit" 
                     }
                 ).Bind(() => menuItem);
 
                 switch (menuItem) {
+                    case "Narrative":
+                        yield return States.Push(new States.NarrativeState(this, new States.Narrative.Scenes.Intro()));
+                        break;
+
                     case "Action":
                         yield return States.Push(new States.ActionState(this));
                         break;

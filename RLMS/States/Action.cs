@@ -15,54 +15,6 @@ using Squared.Util.Event;
 
 namespace RLMS.States {
     public class ActionState : IThreadedState {
-        public class InputHandler {
-            public readonly ActionState State;
-
-            protected Entity[] OrderingEntities = null;
-
-            public InputHandler (ActionState state) {
-                State = state;
-            }
-
-            protected Game Game {
-                get {
-                    return State.Game;
-                }
-            }
-
-            public bool HandleAccept (Vector2 position, InputEvent evt) {
-                if (evt.Type != InputEventType.Press)
-                    return true;
-
-                var entities = State.HitTest<RuntimeLumberjack>(position).ToArray();
-
-                if ((OrderingEntities != null) && (entities.Length == 0)) {
-                    var oe = OrderingEntities;
-                    OrderingEntities = null;
-
-                    foreach (var e in oe)
-                        e.MoveTo(position);
-                } else {
-                    OrderingEntities = entities;
-                }
-
-                return true;
-            }
-
-            public void Draw (ref ImperativeRenderer renderer) {
-                if (Game.InputControls.MouseLocation.HasValue) {
-                    foreach (var entity in State.HitTest<Entity>(Game.InputControls.MouseLocation.Value)) {
-                        renderer.FillRectangle(entity.Bounds, Color.White * 0.5f);
-
-                        renderer.DrawString(Game.UIText, entity.ToString(), entity.Bounds.TopRight);
-                    }
-                }
-            }
-
-            public void Update () {
-            }
-        }
-
         public readonly Game Game;
 
         // FIXME
@@ -161,6 +113,55 @@ namespace RLMS.States {
             renderer.Layer += 1;
 
             Handler.Draw(ref renderer);
+        }
+    }
+
+
+    public class InputHandler {
+        public readonly ActionState State;
+
+        protected Entity[] OrderingEntities = null;
+
+        public InputHandler (ActionState state) {
+            State = state;
+        }
+
+        protected Game Game {
+            get {
+                return State.Game;
+            }
+        }
+
+        public bool HandleAccept (Vector2 position, InputEvent evt) {
+            if (evt.Type != InputEventType.Press)
+                return true;
+
+            var entities = State.HitTest<RuntimeLumberjack>(position).ToArray();
+
+            if ((OrderingEntities != null) && (entities.Length == 0)) {
+                var oe = OrderingEntities;
+                OrderingEntities = null;
+
+                foreach (var e in oe)
+                    e.MoveTo(position);
+            } else {
+                OrderingEntities = entities;
+            }
+
+            return true;
+        }
+
+        public void Draw (ref ImperativeRenderer renderer) {
+            if (Game.InputControls.MouseLocation.HasValue) {
+                foreach (var entity in State.HitTest<Entity>(Game.InputControls.MouseLocation.Value)) {
+                    renderer.FillRectangle(entity.Bounds, Color.White * 0.5f);
+
+                    renderer.DrawString(Game.UIText, entity.ToString(), entity.Bounds.TopRight);
+                }
+            }
+        }
+
+        public void Update () {
         }
     }
 }

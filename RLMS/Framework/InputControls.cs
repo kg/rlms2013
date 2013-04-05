@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Squared.Task;
 using Squared.Util.Event;
 using Squared.Game.Input;
 
@@ -237,6 +238,30 @@ namespace RLMS.Framework {
                 ActiveController = PlayerIndex.One;
             else
                 _UseKeyboard = true;
+        }
+    }
+
+    public static class InputExtensions {
+        private class WaitForPressThunk {
+            public readonly SignalFuture Future = new SignalFuture();
+            public readonly InputEventSubscription Subscription;
+
+            public WaitForPressThunk (InputControl control) {
+                Subscription = control.AddListener(EventHandler);
+            }
+
+            public bool EventHandler (InputControl c, InputEvent e) {
+                if (e.Type == InputEventType.Press) {
+                    Subscription.Dispose();
+                    Future.SetResult(NoneType.None, null);
+                }
+
+                return true;
+            }
+        }
+
+        public static SignalFuture WaitForPress (this InputControl control) {
+            return (new WaitForPressThunk(control)).Future;
         }
     }
 }

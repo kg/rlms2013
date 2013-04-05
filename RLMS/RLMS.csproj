@@ -116,6 +116,12 @@
     <Compile Include="States\Action\Entity.cs" />
     <Compile Include="States\Action\Lumberjack.cs" />
     <Compile Include="States\Action\LumberMill.cs" />
+    <Compile Include="States\Exploration.cs" />
+    <Compile Include="States\Narrative.cs" />
+    <Compile Include="States\Narrative\Scene.cs" />
+    <Compile Include="States\Narrative\Colors.cs" />
+    <Compile Include="States\Narrative\Scenes\Intro.cs" />
+    <Compile Include="States\Narrative\Textbox.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Fracture\Squared\GameLib\Squared.Game.csproj">
@@ -166,7 +172,9 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="States\Exploration\" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />
   <!--
