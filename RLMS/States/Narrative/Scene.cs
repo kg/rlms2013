@@ -136,7 +136,7 @@ namespace RLMS.States.Narrative {
 
                 renderer.DrawString(
                     Font, Text, itemPosition,
-                    Color * ((selected) ? 1f : 0.66f)
+                    Color * ((selected) ? 1f : 0.8f)
                 );
             }
         }

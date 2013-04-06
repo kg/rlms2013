@@ -71,7 +71,7 @@ namespace RLMS.Framework {
 
     public class Menu : IThreadedComponent, IEventSource, IDisposable {
         public const float BorderSize = 12f;
-        public const float BackgroundOpacity = 0.75f;
+        public const float BackgroundOpacity = 0.9f;
 
         public readonly string Description;
         public event Action Cancelled;

@@ -13,7 +13,7 @@ using Squared.Task;
 
 namespace RLMS.States.Narrative {
     public class Textbox {
-        public const int BlippyInterval = 4;
+        public const float BlippyInterval = 4;
         public const float WordWrapRightMargin = 96;
         public const float WordWrapIndent = 20;
 
@@ -34,7 +34,7 @@ namespace RLMS.States.Narrative {
 
         public int TotalCharacterCount = 0;
         public int DisplayedCharacterCount = 0;
-        public int NextBlipTime = 0;
+        public float NextBlipTime = 0;
 
         public SpriteFont DialogueFont, ItalicDialogueFont, MenuFont;
         public Dictionary<string, SoundEffect> Blips;
@@ -101,21 +101,22 @@ namespace RLMS.States.Narrative {
             var prev = DisplayedCharacterCount;
             DisplayedCharacterCount = Math.Min(TotalCharacterCount, DisplayedCharacterCount + advanceSpeed);
 
-            if (DisplayedCharacterCount > prev)
+            if ((DisplayedCharacterCount > prev) && (NextBlipTime > 0))
                 NextBlipTime -= 1;
 
             if ((currentBlip != null) && (NextBlipTime <= 0)) {
                 float blippyVolume = (currentBlip == Blips["Monologue"]) ? 0.4f : 0.75f;
+                blippyVolume = (float)BlippyRNG.NextDouble(blippyVolume - 0.1f, blippyVolume);
                 if (Game.InputControls.Accept.State)
-                    blippyVolume = 0.33f;
+                    blippyVolume *= 0.4f;
 
-                currentBlip.Play(blippyVolume, (float)BlippyRNG.NextDouble(-0.055f, 0.055f), 0f);
-                NextBlipTime = BlippyInterval;
+                currentBlip.Play(blippyVolume, (float)BlippyRNG.NextDouble(-0.07f, 0.070f), 0f);
+                NextBlipTime += (float)BlippyRNG.NextDouble(BlippyInterval - 1, BlippyInterval + 2);
             }
         }
 
         public void Draw (Frame frame, ref ImperativeRenderer renderer) {
-            renderer.FillRectangle(Bounds.Expand(4, 4), Color.Black);
+            renderer.FillRectangle(Bounds.Expand(4, 4), Color.Black * 0.9f);
             renderer.Layer += 1;
             renderer.OutlineRectangle(Bounds.Expand(5, 5), Color.White);
             renderer.Layer += 1;
