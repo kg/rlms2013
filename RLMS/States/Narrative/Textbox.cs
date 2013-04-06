@@ -13,7 +13,7 @@ using Squared.Task;
 
 namespace RLMS.States.Narrative {
     public class Textbox {
-        public const float BlippyInterval = 10;
+        public const float BlippyInterval = 8;
         public const float WordWrapRightMargin = 96;
         public const float WordWrapIndent = 20;
 
@@ -116,13 +116,13 @@ namespace RLMS.States.Narrative {
                 NextBlipTime = 0;
 
             if ((currentBlip != null) && (NextBlipTime <= 0)) {
-                float blippyVolume = (currentBlip == Blips["Monologue"]) ? 0.5f : 0.7f;
-                blippyVolume = (float)BlippyRNG.NextDouble(blippyVolume - 0.2f, blippyVolume);
+                float blippyVolume = (currentBlip == Blips["Monologue"]) ? 0.5f : 0.65f;
+                blippyVolume = (float)BlippyRNG.NextDouble(blippyVolume - 0.1f, blippyVolume);
                 if (Game.InputControls.Accept.State)
                     blippyVolume *= 0.4f;
 
-                currentBlip.Play(blippyVolume, (float)BlippyRNG.NextDouble(-0.125f, 0.125f), 0f);
-                NextBlipTime += (float)BlippyRNG.NextDouble(BlippyInterval - 0.75f, BlippyInterval + 2.25f);
+                currentBlip.Play(blippyVolume, (float)BlippyRNG.NextDouble(-0.11f, 0.11f), 0f);
+                NextBlipTime += (float)BlippyRNG.NextDouble(BlippyInterval - 0.5f, BlippyInterval + 1.5f);
             }
         }
 

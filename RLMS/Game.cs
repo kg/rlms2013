@@ -130,7 +130,7 @@ namespace RLMS {
 
             yield return Menu.ShowNew(
                 this, "Scene Select",
-                (from t in allSceneTypes select t.Name)
+                (from t in allSceneTypes orderby t.Name select t.Name)
             ).Bind(() => sceneName);
 
             var sceneType = allSceneTypes.FirstOrDefault((s) => s.Name == sceneName);
@@ -148,7 +148,7 @@ namespace RLMS {
 
             yield return Menu.ShowNew(
                 this, "Area Select",
-                (from t in allAreaTypes select t.Name)
+                (from t in allAreaTypes orderby t.Name select t.Name)
             ).Bind(() => areaName);
 
             var areaType = allAreaTypes.FirstOrDefault((s) => s.Name == areaName);
