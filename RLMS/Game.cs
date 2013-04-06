@@ -136,7 +136,7 @@ namespace RLMS {
             var sceneType = allSceneTypes.FirstOrDefault((s) => s.Name == sceneName);
 
             if (sceneType != null)
-                yield return States.Push(new States.NarrativeState(this, (Scene)Activator.CreateInstance(sceneType)));
+                yield return PlayScene(sceneType);
 
             yield break;
         }
@@ -154,7 +154,33 @@ namespace RLMS {
             var areaType = allAreaTypes.FirstOrDefault((s) => s.Name == areaName);
 
             if (areaType != null)
-                yield return States.Push(new States.ExplorationState(this, (Area)Activator.CreateInstance(areaType)));
+                yield return VisitArea(areaType);
+        }
+
+        public IFuture PlayScene<T> ()
+            where T : Scene {
+            return PlayScene(typeof(T));
+        }
+
+        internal IFuture PlayScene (Type sceneType) {
+            return PlayScene((Scene)Activator.CreateInstance(sceneType));
+        }
+
+        internal IFuture PlayScene (Scene scene) {
+            return States.Push(new States.NarrativeState(this, scene));
+        }
+
+        public IFuture VisitArea<T> ()
+            where T : Area {
+            return VisitArea(typeof(T));
+        }
+
+        internal IFuture VisitArea (Type areaType) {
+            return VisitArea((Area)Activator.CreateInstance(areaType));
+        }
+
+        internal IFuture VisitArea (Area area) {
+            return States.Push(new States.ExplorationState(this, area));
         }
 
         protected override void Update (GameTime gameTime) {
@@ -162,9 +188,8 @@ namespace RLMS {
 
             Scheduler.Step();
 
-            var currentState = States.Current;
-            if (currentState != null)
-                currentState.Update();
+            foreach (var state in States)
+                state.Update();
 
             foreach (var component in Components)
                 component.Update();
@@ -187,9 +212,8 @@ namespace RLMS {
             ir.Clear(color: new Color(0, 0, 32));
             ir.Layer += 1;
 
-            var currentState = States.Current;
-            if (currentState != null)
-                currentState.Draw(frame, ref ir);
+            foreach (var state in States)
+                state.Draw(frame, ref ir);
 
             foreach (var component in Components)
                 component.Draw(frame, ref ir);

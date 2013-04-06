@@ -34,7 +34,7 @@ namespace RLMS.Framework {
         }
     }
 
-    public class ThreadedStateStack {
+    public class ThreadedStateStack : IEnumerable<IThreadedState> {
         private Dictionary<IThreadedState, IFuture> Futures = new Dictionary<IThreadedState, IFuture>();
         private List<IThreadedState> Stack = new List<IThreadedState>();
         private TaskScheduler Scheduler;
@@ -47,6 +47,10 @@ namespace RLMS.Framework {
             if (Futures.ContainsKey(state))
                 throw new InvalidOperationException();
 
+            if (Stack.Count > 0)
+                Current.IsTopmost = false;
+
+            state.IsTopmost = true;
             Stack.Add(state);
 
             var future = Scheduler.Start(
@@ -69,6 +73,8 @@ namespace RLMS.Framework {
                 return;
 
             Stack.Remove(state);
+            if (Stack.Count > 0)
+                Stack[Stack.Count - 1].IsTopmost = true;
 
             var f = Futures[state];
             Futures.Remove(state);
@@ -96,6 +102,14 @@ namespace RLMS.Framework {
 
                 return Stack[Stack.Count - 1];
             }
+        }
+
+        public IEnumerator<IThreadedState> GetEnumerator () {
+            return Stack.GetEnumerator();
+        }
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator () {
+            return Stack.GetEnumerator();
         }
     }
 }

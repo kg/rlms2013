@@ -19,5 +19,7 @@ namespace RLMS.Framework {
 
         void Update ();
         void Draw (Frame frame, ref ImperativeRenderer renderer);
+
+        bool IsTopmost { set; }
     }
 }

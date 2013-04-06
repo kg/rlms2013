@@ -118,7 +118,10 @@
     <Compile Include="States\Action\LumberMill.cs" />
     <Compile Include="States\Exploration.cs" />
     <Compile Include="States\Exploration\Area.cs" />
+    <Compile Include="States\Exploration\Areas\OnboardFerry.cs" />
     <Compile Include="States\Exploration\Areas\FerryDock.cs" />
+    <Compile Include="States\Exploration\AreaView.cs" />
+    <Compile Include="States\Exploration\Hotspot.cs" />
     <Compile Include="States\Narrative.cs" />
     <Compile Include="States\Narrative\Branch.cs" />
     <Compile Include="States\Narrative\Scene.cs" />

@@ -94,13 +94,19 @@ namespace RLMS.States.Narrative {
             }
         }
 
+        public virtual IEnumerator<object> LoadContent () {
+            yield break;
+        }
+
         public abstract IEnumerator<object> Main ();
 
         public static Type[] GetAllSceneTypes () {
             var tScene = typeof(Scene);
             return (
                 from t in Assembly.GetExecutingAssembly().GetTypes() 
-                where !t.IsAbstract && tScene.IsAssignableFrom(t) 
+                where !t.IsAbstract && 
+                    tScene.IsAssignableFrom(t) &&
+                    t.GetConstructors().Any((c) => c.GetParameters().Length == 0)
                 select t
             ).ToArray();
         }

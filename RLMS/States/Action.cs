@@ -44,11 +44,19 @@ namespace RLMS.States {
         }
 
         private bool DefaultAcceptListener (InputControl c, InputEvent e) {
+            if (!IsTopmost)
+                return false;
+
             var ml = Game.InputControls.MouseLocation;
             if (!ml.HasValue)
                 return false;
 
             return Handler.HandleAccept(ml.Value, e);
+        }
+
+        public bool IsTopmost {
+            get;
+            set;
         }
 
         public EventBus EventBus {
@@ -120,54 +128,53 @@ namespace RLMS.States {
 
             Handler.Draw(ref renderer);
         }
-    }
 
+        public class InputHandler {
+            public readonly ActionState State;
 
-    public class InputHandler {
-        public readonly ActionState State;
+            protected Entity[] OrderingEntities = null;
 
-        protected Entity[] OrderingEntities = null;
-
-        public InputHandler (ActionState state) {
-            State = state;
-        }
-
-        protected Game Game {
-            get {
-                return State.Game;
-            }
-        }
-
-        public bool HandleAccept (Vector2 position, InputEvent evt) {
-            if (evt.Type != InputEventType.Press)
-                return true;
-
-            var entities = State.HitTest<RuntimeLumberjack>(position).ToArray();
-
-            if ((OrderingEntities != null) && (entities.Length == 0)) {
-                var oe = OrderingEntities;
-                OrderingEntities = null;
-
-                foreach (var e in oe)
-                    e.MoveTo(position);
-            } else {
-                OrderingEntities = entities;
+            public InputHandler (ActionState state) {
+                State = state;
             }
 
-            return true;
-        }
-
-        public void Draw (ref ImperativeRenderer renderer) {
-            if (Game.InputControls.MouseLocation.HasValue) {
-                foreach (var entity in State.HitTest<Entity>(Game.InputControls.MouseLocation.Value)) {
-                    renderer.FillRectangle(entity.Bounds, Color.White * 0.5f);
-
-                    renderer.DrawString(Game.UIText, entity.ToString(), entity.Bounds.TopRight);
+            protected Game Game {
+                get {
+                    return State.Game;
                 }
             }
-        }
 
-        public void Update () {
+            public bool HandleAccept (Vector2 position, InputEvent evt) {
+                if (evt.Type != InputEventType.Press)
+                    return true;
+
+                var entities = State.HitTest<RuntimeLumberjack>(position).ToArray();
+
+                if ((OrderingEntities != null) && (entities.Length == 0)) {
+                    var oe = OrderingEntities;
+                    OrderingEntities = null;
+
+                    foreach (var e in oe)
+                        e.MoveTo(position);
+                } else {
+                    OrderingEntities = entities;
+                }
+
+                return true;
+            }
+
+            public void Draw (ref ImperativeRenderer renderer) {
+                if (Game.InputControls.MouseLocation.HasValue) {
+                    foreach (var entity in State.HitTest<Entity>(Game.InputControls.MouseLocation.Value)) {
+                        renderer.FillRectangle(entity.Bounds, Color.White * 0.5f);
+
+                        renderer.DrawString(Game.UIText, entity.ToString(), entity.Bounds.TopRight);
+                    }
+                }
+            }
+
+            public void Update () {
+            }
         }
     }
 }

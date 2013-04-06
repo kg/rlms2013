@@ -129,7 +129,7 @@ namespace RLMS.States.Narrative {
         public void Draw (Frame frame, ref ImperativeRenderer renderer) {
             renderer.FillRectangle(Bounds.Expand(4, 4), Color.Black * 0.9f);
             renderer.Layer += 1;
-            renderer.OutlineRectangle(Bounds.Expand(5, 5), Color.White);
+            renderer.OutlineRectangle(Bounds.Expand(4, 4), Color.White);
             renderer.Layer += 1;
 
             int charactersLeft = DisplayedCharacterCount;

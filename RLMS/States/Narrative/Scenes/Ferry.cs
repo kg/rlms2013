@@ -7,7 +7,7 @@ using RLMS.Framework;
 using Squared.Task;
 
 namespace RLMS.States.Narrative.Scenes {
-    public class FerryPilot : Narrative.Scene {
+    public class FerryPilot : Scene {
         public override IEnumerator<object> Main () {
             Textbox.Clear();
 
@@ -119,6 +119,30 @@ namespace RLMS.States.Narrative.Scenes {
             );
 
             yield return HaveAnyQuestions();
+        }
+    }
+
+    public class FerryDockEntered : Scene {
+        public override IEnumerator<object> Main() {
+            yield return ShowSmartText(
+                "The ferry only runs twice a day, so of course you have to be here at six in the morning. No wonder the place is deserted."
+            );
+
+            yield return ShowAdvancePrompt();
+        }
+    }
+
+    public class OnboardFerryEntered : Scene {
+        public override IEnumerator<object> Main () {
+            yield return ShowSmartText(
+                "If the dust piled up on the seats is any indication, this ferry doesn't see many passengers..."
+            );
+
+            yield return ShowAdvancePrompt();
+
+            yield return Pause(1.5f);
+
+            State.ChangeScene<FerryPilot>();
         }
     }
 }

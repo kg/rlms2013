@@ -33,6 +33,11 @@ namespace RLMS.States {
             Textbox = new Textbox(this);
         }
 
+        public bool IsTopmost {
+            get;
+            set;
+        }
+
         public EventBus EventBus {
             get {
                 return Game.EventBus;
@@ -57,6 +62,9 @@ namespace RLMS.States {
             while (CurrentScene != null) {
                 var scene = CurrentScene;
                 CurrentScene = null;
+
+                yield return scene.LoadContent();
+
                 var playFuture = scene.Play(this);
                 Disposables.Add(playFuture);
                 try {
@@ -66,6 +74,15 @@ namespace RLMS.States {
                 }
                 yield return new WaitForNextStep();
             }
+        }
+
+        public void ChangeScene<T> ()
+            where T : Scene {
+            CurrentScene = Activator.CreateInstance<T>();
+        }
+
+        public void ChangeScene (Scene scene) {
+            CurrentScene = scene;
         }
 
         public void Dispose () {
