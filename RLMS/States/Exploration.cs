@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using RLMS.Framework;
+using RLMS.States.Exploration;
 using Squared.Game;
 using Squared.Game.Input;
 using Squared.Render;
@@ -14,26 +15,34 @@ using Squared.Task;
 using Squared.Util.Event;
 
 namespace RLMS.States {
-    public class ExplorationState : IThreadedState {
+    public class ExplorationState : IThreadedState, IDisposable {
         public readonly Game Game;
+        public readonly Area Area;
 
         private bool ContentLoaded = false;
 
-        public ExplorationState (Game game) {
-            Game = game;
+        private InputEventSubscription AcceptSubscription;
 
-            // Game.InputControls.Accept.AddListener(DefaultAcceptListener);
+        public ExplorationState (Game game, Area area) {
+            Game = game;
+            Area = area;
+
+            AcceptSubscription = game.InputControls.Accept.AddListener(DefaultAcceptListener);
+
+            area.Initialize(this);
         }
 
-        /*
+        public void Dispose () {
+            AcceptSubscription.Dispose();
+        }
+
         private bool DefaultAcceptListener (InputControl c, InputEvent e) {
             var ml = Game.InputControls.MouseLocation;
             if (!ml.HasValue)
                 return false;
 
-            return Handler.HandleAccept(ml.Value, e);
+            return true;
         }
-         */
 
         public EventBus EventBus {
             get {
@@ -50,8 +59,12 @@ namespace RLMS.States {
         public IEnumerator<object> Main () {
             yield return LoadContent();
 
+            yield return Area.OnEnter();
+
             while (true)
                 yield return new WaitForNextStep();
+
+            yield return Area.OnExit();
         }
 
         public void Update () {

@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using RLMS.States.Exploration;
 using RLMS.States.Narrative;
 using Squared.Game.Input;
 using Squared.Render;
@@ -96,6 +97,7 @@ namespace RLMS {
                     this, "Mode Select",
                     new[] {
                         "Narrative",
+                        "Exploration",
                         "Action",
                         "Exit" 
                     }
@@ -104,6 +106,10 @@ namespace RLMS {
                 switch (menuItem) {
                     case "Narrative":
                         yield return NarrativeTest();
+                        break;
+
+                    case "Exploration":
+                        yield return ExplorationTest();
                         break;
 
                     case "Action":
@@ -131,6 +137,24 @@ namespace RLMS {
 
             if (sceneType != null)
                 yield return States.Push(new States.NarrativeState(this, (Scene)Activator.CreateInstance(sceneType)));
+
+            yield break;
+        }
+
+        public IEnumerator<object> ExplorationTest () {
+            var allAreaTypes = Area.GetAllAreaTypes();
+
+            string areaName = null;
+
+            yield return Menu.ShowNew(
+                this, "Area Select",
+                (from t in allAreaTypes select t.Name)
+            ).Bind(() => areaName);
+
+            var areaType = allAreaTypes.FirstOrDefault((s) => s.Name == areaName);
+
+            if (areaType != null)
+                yield return States.Push(new States.ExplorationState(this, (Area)Activator.CreateInstance(areaType)));
         }
 
         protected override void Update (GameTime gameTime) {
@@ -145,8 +169,10 @@ namespace RLMS {
             foreach (var component in Components)
                 component.Update();
 
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.Exit();
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed) {
+                while (States.Count > 0)
+                    States.Pop();
+            }
 
             base.Update(gameTime);
         }

@@ -50,23 +50,43 @@ namespace RLMS.Framework {
             Stack.Add(state);
 
             var future = Scheduler.Start(
-                state.Main(), TaskExecutionPolicy.RunAsBackgroundTask
+                state.Main(), TaskExecutionPolicy.RunWhileFutureLives
             );
             Futures[state] = future;
 
             future.RegisterOnComplete((_) => {
-                Stack.Remove(state);
+                Remove(state);
+            });
+            future.RegisterOnDispose((_) => {
+                Remove(state);
             });
 
             return future;
         }
 
+        internal void Remove (IThreadedState state) {
+            if (!Futures.ContainsKey(state))
+                return;
+
+            Stack.Remove(state);
+
+            var f = Futures[state];
+            Futures.Remove(state);
+
+            f.Dispose();
+            if (state is IDisposable)
+                ((IDisposable)state).Dispose();
+        }
+
         public void Pop () {
             var state = Stack.Last();
-            Stack.RemoveAt(Stack.Count - 1);
+            Remove(state);
+        }
 
-            Futures[state].Dispose();
-            Futures.Remove(state);
+        public int Count {
+            get {
+                return Stack.Count;
+            }
         }
 
         public IThreadedState Current {

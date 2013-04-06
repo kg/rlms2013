@@ -93,33 +93,38 @@ namespace RLMS.Framework {
             var f = new Future<string>();
 
             var menu = new Menu(game, description, f);
-            menu.Font = font ?? menu.Font;
+            try {
+                menu.Font = font ?? menu.Font;
 
-            foreach (var item in items) {
-                if (item is IMenuItem) {
-                    menu.Items.Add((IMenuItem)item);
-                } else if (item is string) {
-                    var menuItem = new TextMenuItem {
-                        Text = (string)item,
-                        Handler = (i) => {
-                            menu.Close();
-                            f.SetResult(i.Text, null);
-                        }
-                    };
-                    menu.Items.Add(menuItem);
-                } else {
-                    throw new InvalidOperationException("Menu items must be strings or IMenuItem instances");
+                foreach (var item in items) {
+                    if (item is IMenuItem) {
+                        menu.Items.Add((IMenuItem)item);
+                    } else if (item is string) {
+                        var menuItem = new TextMenuItem {
+                            Text = (string)item,
+                            Handler = (i) => {
+                                menu.Close();
+                                f.SetResult(i.Text, null);
+                            }
+                        };
+                        menu.Items.Add(menuItem);
+                    } else {
+                        throw new InvalidOperationException("Menu items must be strings or IMenuItem instances");
+                    }
                 }
+
+                menu.Cancelled += () => { f.SetResult(null, null); };
+
+                while (!game.InputControls.Available)
+                    yield return new WaitForNextStep();
+
+                game.Components.Add(menu);
+
+                yield return f;
+            } finally {
+                game.Components.Remove(menu);
+                menu.Dispose();
             }
-
-            menu.Cancelled += () => { f.SetResult(null, null); };
-
-            while (!game.InputControls.Available)
-                yield return new WaitForNextStep();
-
-            game.Components.Add(menu);
-
-            yield return f;
 
             yield return new Result(f.Result);
         }

@@ -13,7 +13,7 @@ using Squared.Task;
 
 namespace RLMS.States.Narrative {
     public class Textbox {
-        public const float BlippyInterval = 4;
+        public const float BlippyInterval = 10;
         public const float WordWrapRightMargin = 96;
         public const float WordWrapIndent = 20;
 
@@ -38,8 +38,11 @@ namespace RLMS.States.Narrative {
 
         public SpriteFont DialogueFont, ItalicDialogueFont, MenuFont;
         public Dictionary<string, SoundEffect> Blips;
+        public Texture2D AdvancePromptIcon;
 
         public readonly Random BlippyRNG = new Random();
+
+        public bool AdvancePromptVisible = false;
 
         public Textbox (NarrativeState state) {
             State = state;
@@ -56,6 +59,8 @@ namespace RLMS.States.Narrative {
         }
 
         public IEnumerator<object> LoadContent () {
+            yield return Game.ContentLoader.LoadContent<Texture2D>("advance").Bind(() => AdvancePromptIcon);
+
             yield return Game.ContentLoader.LoadContent<SpriteFont>("Dialogue").Bind(() => DialogueFont);
             yield return Game.ContentLoader.LoadContent<SpriteFont>("DialogueItalic").Bind(() => ItalicDialogueFont);
 
@@ -68,6 +73,7 @@ namespace RLMS.States.Narrative {
             TotalCharacterCount = 0;
 
             int charactersLeft = DisplayedCharacterCount;
+            bool forceBlip = false;
 
             SoundEffect currentBlip = null;
 
@@ -79,8 +85,10 @@ namespace RLMS.States.Narrative {
                 var isVisible = (charactersToDraw > 0);
                 charactersLeft -= charactersToDraw;
 
-                if (isFullyVisible && (s.Future != null) && !s.Future.Completed)
+                if (isFullyVisible && (s.Future != null) && !s.Future.Completed) {
                     s.Future.SetResult(NoneType.None, null);
+                    forceBlip = true;
+                }
 
                 if (!isFullyVisible) {
                     if (!Blips.TryGetValue(Speakers.ByName[s.Speaker].BlipSoundName, out currentBlip))
@@ -104,14 +112,17 @@ namespace RLMS.States.Narrative {
             if ((DisplayedCharacterCount > prev) && (NextBlipTime > 0))
                 NextBlipTime -= 1;
 
+            if (forceBlip && (NextBlipTime > 0))
+                NextBlipTime = 0;
+
             if ((currentBlip != null) && (NextBlipTime <= 0)) {
-                float blippyVolume = (currentBlip == Blips["Monologue"]) ? 0.4f : 0.75f;
-                blippyVolume = (float)BlippyRNG.NextDouble(blippyVolume - 0.1f, blippyVolume);
+                float blippyVolume = (currentBlip == Blips["Monologue"]) ? 0.5f : 0.7f;
+                blippyVolume = (float)BlippyRNG.NextDouble(blippyVolume - 0.2f, blippyVolume);
                 if (Game.InputControls.Accept.State)
                     blippyVolume *= 0.4f;
 
-                currentBlip.Play(blippyVolume, (float)BlippyRNG.NextDouble(-0.07f, 0.070f), 0f);
-                NextBlipTime += (float)BlippyRNG.NextDouble(BlippyInterval - 1, BlippyInterval + 2);
+                currentBlip.Play(blippyVolume, (float)BlippyRNG.NextDouble(-0.125f, 0.125f), 0f);
+                NextBlipTime += (float)BlippyRNG.NextDouble(BlippyInterval - 0.75f, BlippyInterval + 2.25f);
             }
         }
 
@@ -141,6 +152,14 @@ namespace RLMS.States.Narrative {
                     renderer.DrawMultiple(s.Layout.Slice(0, charactersToDraw));
                 }
                 charactersLeft -= s.Length;
+            }
+
+            renderer.Layer += 1;
+
+            if (AdvancePromptVisible) {
+                var advancePromptPosition = Bounds.BottomRight;
+                advancePromptPosition.Y -= Squared.Util.Arithmetic.PulseSine((float)(Squared.Util.Time.Seconds * 0.66), 0f, 24f);
+                renderer.Draw(AdvancePromptIcon, advancePromptPosition, origin: new Vector2(0.85f, 0.8f));
             }
 
             renderer.Layer += 1;

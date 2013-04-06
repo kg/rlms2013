@@ -14,7 +14,7 @@ using Squared.Task;
 using Squared.Util.Event;
 
 namespace RLMS.States {
-    public class ActionState : IThreadedState {
+    public class ActionState : IThreadedState, IDisposable {
         public readonly Game Game;
 
         // FIXME
@@ -28,13 +28,19 @@ namespace RLMS.States {
 
         private bool ContentLoaded = false;
 
+        private InputEventSubscription AcceptSubscription;
+
         public ActionState (Game game) {
             Game = game;
             Handler = new InputHandler(this);
 
             SetupRuntimeState();
 
-            Game.InputControls.Accept.AddListener(DefaultAcceptListener);
+            AcceptSubscription = Game.InputControls.Accept.AddListener(DefaultAcceptListener);
+        }
+
+        public void Dispose () {
+            AcceptSubscription.Dispose();
         }
 
         private bool DefaultAcceptListener (InputControl c, InputEvent e) {

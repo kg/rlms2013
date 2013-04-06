@@ -117,7 +117,10 @@
     <Compile Include="States\Action\Lumberjack.cs" />
     <Compile Include="States\Action\LumberMill.cs" />
     <Compile Include="States\Exploration.cs" />
+    <Compile Include="States\Exploration\Area.cs" />
+    <Compile Include="States\Exploration\Areas\FerryDock.cs" />
     <Compile Include="States\Narrative.cs" />
+    <Compile Include="States\Narrative\Branch.cs" />
     <Compile Include="States\Narrative\Scene.cs" />
     <Compile Include="States\Narrative\Scenes\Ferry.cs" />
     <Compile Include="States\Narrative\Speakers.cs" />
@@ -173,9 +176,7 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="States\Exploration\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />
   <!--

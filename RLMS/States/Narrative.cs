@@ -15,17 +15,16 @@ using Squared.Task;
 using Squared.Util.Event;
 
 namespace RLMS.States {
-    public class NarrativeState : IThreadedState {
+    public class NarrativeState : IThreadedState, IDisposable {
         public readonly Game Game;
 
         public Scene CurrentScene;
 
         public readonly Textbox Textbox;
 
-        private bool ContentLoaded = false;
-        public bool AdvancePromptVisible = false;
+        internal readonly HashSet<IDisposable> Disposables = new HashSet<IDisposable>();
 
-        public Texture2D AdvancePromptIcon;
+        private bool ContentLoaded = false;
 
         public NarrativeState (Game game, Scene scene) {
             Game = game;
@@ -47,8 +46,6 @@ namespace RLMS.States {
         }
 
         protected IEnumerator<object> LoadContent () {
-            yield return Game.ContentLoader.LoadContent<Texture2D>("advance").Bind(() => AdvancePromptIcon);
-
             yield return Textbox.LoadContent();
 
             ContentLoaded = true;
@@ -60,9 +57,24 @@ namespace RLMS.States {
             while (CurrentScene != null) {
                 var scene = CurrentScene;
                 CurrentScene = null;
-                yield return scene.Play(this);
+                var playFuture = scene.Play(this);
+                Disposables.Add(playFuture);
+                try {
+                    yield return playFuture;
+                } finally {
+                    Disposables.Remove(playFuture);
+                }
                 yield return new WaitForNextStep();
             }
+        }
+
+        public void Dispose () {
+            CurrentScene = null;
+
+            foreach (var disposable in Disposables)
+                disposable.Dispose();
+
+            Disposables.Clear();
         }
 
         public void Update () {
@@ -74,12 +86,6 @@ namespace RLMS.States {
                 return;
 
             Textbox.Draw(frame, ref renderer);
-
-            if (AdvancePromptVisible) {
-                var advancePromptPosition = Textbox.Bounds.BottomRight;
-                advancePromptPosition.Y -= Squared.Util.Arithmetic.Pulse((float)(Squared.Util.Time.Seconds * 0.66), 0f, 24f);
-                renderer.Draw(AdvancePromptIcon, advancePromptPosition, origin: new Vector2(0.85f, 0.8f));
-            }
         }
     }
 
@@ -87,7 +93,8 @@ namespace RLMS.States {
         public static SignalFuture Play (this Scene scene, NarrativeState state) {
             var result = new SignalFuture();
             scene.Initialize(state);
-            state.Scheduler.Start(result, new SchedulableGeneratorThunk(scene.Main()), TaskExecutionPolicy.RunAsBackgroundTask);
+            state.Scheduler.Start(result, new SchedulableGeneratorThunk(scene.Main()), TaskExecutionPolicy.RunWhileFutureLives);
+            state.Disposables.Add(result);
             return result;
         }
     }
