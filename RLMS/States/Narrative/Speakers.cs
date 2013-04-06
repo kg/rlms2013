@@ -28,17 +28,17 @@ namespace RLMS.States.Narrative {
             new Speaker {
                 Name = "Callista",
                 BlipSoundName = "Callista",
-                Color = new Color(206, 66, 101)
+                Color = new Color(226, 116, 151)
             },
             new Speaker {
                 Name = "Dad",
                 BlipSoundName = "Dad",
-                Color = new Color(43, 137, 196)
+                Color = new Color(93, 187, 240)
             },
             new Speaker {
                 Name = "Steve",
                 BlipSoundName = "Steve",
-                Color = new Color(63, 220, 80)
+                Color = new Color(103, 240, 120)
             }
         };
     }
